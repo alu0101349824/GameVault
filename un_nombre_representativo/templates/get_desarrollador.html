@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desarrolladores</title>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/desarrollador">Desarrolladores</a></li>
+            <li><a href="/videojuegos">Videojuegos</a></li>
+            <li><a href="/generos">Géneros</a></li>
+            <li><a href="/logros">Logros</a></li>
+            <li><a href="/comentarios">Comentarios</a></li>
+            <li><a href="/dlc">DLC</a></li>
+            <li><a href="/bibliotecas">Bibliotecas</a></li>
+            <li><a href="/distribuidores">Distribuidores</a></li>
+        </ul>
+    </nav>
+
+
+
+
+
+    <h1>Lista de Desarrolladores</h1>
+    <ul>
+        {% for desarrollador in desarrolladores %}
+            <li>{{ desarrollador }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
