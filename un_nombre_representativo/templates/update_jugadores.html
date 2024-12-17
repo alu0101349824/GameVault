@@ -1,0 +1,58 @@
+
+
+
+
+{% block content %}
+    <h1>Actualizar Jugador</h1>
+
+
+    <!-- Formulario para ingresar el ID -->
+    {% if not jugador %}
+        <form method="POST">
+            <label for="id">ID del Jugador:</label>
+            <input type="number" id="id" name="id" required>
+            <button type="submit">Buscar Jugador</button>
+        </form>
+    {% else %}
+        <!-- Formulario para actualizar los datos del jugador -->
+        <form method="POST">
+            <input type="hidden" name="id" value="{{ jugador[0] }}">
+            
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" value="{{ jugador[1] }}" required><br>
+
+
+            <label for="contraseña">Contraseña:</label>
+            <input type="password" id="contraseña" name="contraseña" value="{{ jugador[2] }}" required><br>
+
+
+            <label for="correo">Correo:</label>
+            <input type="email" id="correo" name="correo" value="{{ jugador[3] }}" required><br>
+
+
+            <label for="pais">País:</label>
+            <input type="text" id="pais" name="pais" value="{{ jugador[4] }}" required><br>
+
+
+            <label for="imagen_perfil">Imagen de Perfil:</label>
+            <input type="text" id="imagen_perfil" name="imagen_perfil" value="{{ jugador[5] }}"><br>
+
+
+            <label for="descripcion">Descripción:</label>
+            <textarea id="descripcion" name="descripcion">{{ jugador[6] }}</textarea><br>
+
+
+            <label for="tarjeta_credito">Tarjeta de Crédito:</label>
+            <input type="text" id="tarjeta_credito" name="tarjeta_credito" value="{{ jugador[7] }}"><br>
+
+
+            <button type="submit">Actualizar Jugador</button>
+        </form>
+    {% endif %}
+{% endblock %}
+
+
+
+
+
+

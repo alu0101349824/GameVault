@@ -1,0 +1,43 @@
+
+
+
+{% block content %}
+<h1>Agregar Nuevo Jugador</h1>
+<form method="POST" action="{{ url_for('add_jugador') }}">
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" name="nombre" required><br><br>
+
+
+    <label for="contraseña">Contraseña:</label>
+    <input type="password" id="contraseña" name="contraseña" required><br><br>
+
+
+    <label for="correo">Correo:</label>
+    <input type="email" id="correo" name="correo" required><br><br>
+
+
+    <label for="pais">País:</label>
+    <input type="text" id="pais" name="pais" required><br><br>
+
+
+    <label for="imagen_perfil">Imagen de Perfil (URL):</label>
+    <input type="text" id="imagen_perfil" name="imagen_perfil"><br><br>
+
+
+    <label for="descripcion">Descripción:</label>
+    <textarea id="descripcion" name="descripcion"></textarea><br><br>
+
+
+    <label for="tarjeta_credito">Tarjeta de Crédito (XXXX-XXXX-XXXX-XXXX):</label>
+    <input type="text" id="tarjeta_credito" name="tarjeta_credito"><br><br>
+
+
+    <button type="submit">Agregar Jugador</button>
+</form>
+{% endblock %}
+
+
+
+
+
+

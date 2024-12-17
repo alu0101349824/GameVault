@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jugadores</title>
+    <title>Inicio</title>
 </head>
 <body>
     <nav>
         <ul>
             <li><a href="/">Inicio</a></li>
+            <li><a href="/jugadores">Jugadores</a></li>
             <li><a href="/desarrollador">Desarrolladores</a></li>
             <li><a href="/videojuegos">Videojuegos</a></li>
             <li><a href="/generos">Géneros</a></li>
@@ -19,12 +20,13 @@
             <li><a href="/distribuidores">Distribuidores</a></li>
         </ul>
     </nav>
-    <h1>Lista de Jugadores</h1>
-    <ul>
-        {% for jugador in jugadorres %}
-            <li>{{ jugador }}</li>
-        {% endfor %}
-    </ul>
+
+        {% if error_message %}
+        <div style="color: red; border: 1px solid red; padding: 10px; margin: 10px 0;">
+            <strong>Error:</strong> {{ error_message }}
+        </div>
+    {% endif %}
+
 </body>
 </html>
 

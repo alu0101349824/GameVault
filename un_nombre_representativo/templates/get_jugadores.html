@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jugadores</title>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/addjugadores">Añadir Jugadores</a></li>
+            <li><a href="/updatejugadores">Actualizar Jugadores</a></li>
+            <li><a href="/deletejugadores">Eliminar Jugadores</a></li>
+        </ul>
+    </nav>
+    <h1>Lista de Jugadores</h1>
+    <ul>
+        {% for jugador in jugadorres %}
+            <li>{{ jugador }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+
