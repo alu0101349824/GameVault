@@ -51,9 +51,9 @@ def add_jugador():
 
         # Validación básica
         if not all([nombre, contraseña, correo, pais]):
-            return render_template('error.html', error_message="Los campos obligatorios no pueden estar vacíos.")
-
-
+            return render_template('index.html', error_message="Los campos obligatorios no pueden estar vacíos.")
+        
+        
         # Conectar a la base de datos
         conn = get_db_connection()
 
@@ -61,15 +61,31 @@ def add_jugador():
         try:
             # Insertar datos
             cur = conn.cursor()
+
+            # Insertar en JUGADOR
             cur.execute('''
                 INSERT INTO JUGADOR (Nombre, Contraseña, Correo, Pais, Imagen_perfil, Descripcion, Tarjeta_credito)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
             ''', (nombre, contraseña, correo, pais, imagen_perfil, descripcion, tarjeta_credito))
-
-
             conn.commit()
-            cur.close()
-            conn.close()
+
+            # Recuperar el Id_jugador
+            cur.execute('''
+                SELECT Id_jugador FROM JUGADOR
+                WHERE Tarjeta_credito = %s
+            ''', (tarjeta_credito,))
+            id_ = cur.fetchone()
+
+            if id_:
+                # Extraer el Id_jugador de la tupla
+                id_jugador = id_[0]
+
+                # Insertar en BIBLIOTECA
+                cur.execute('''
+                    INSERT INTO BIBLIOTECA (Id_jugador, Numero_juegos, Espacio_usado)
+                    VALUES (%s, %s, %s)
+                ''', (id_jugador, 0, 0.0))  # Inicia con 0 juegos y 0 espacio usado
+                conn.commit()
 
 
             # Redirigir a página de éxito
@@ -233,7 +249,9 @@ def get_desarrolladores():
     desarrolladores = cur.fetchall()
     cur.close()
     conn.close()
-    return render_template('get_desarrollador.html', desarrolladores=desarrolladores )    
+    return render_template('get_desarrollador.html', desarrolladores=desarrolladores )   
+
+
 
 
 @app.route('/videojuegos', methods=["GET"])
