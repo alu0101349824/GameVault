@@ -676,6 +676,52 @@ def get_logros():
     conn.close()
     return render_template('get_logros.html', logros=logros)
 
+@app.route('/addlogros', methods=['GET', 'POST'])
+def add_logro():
+    if request.method == 'POST':
+        # Obtener los datos del formulario
+        nombre = request.form['nombre']
+        descripcion = request.form.get('descripcion', None)
+        requisito = request.form.get('requisito', None)
+
+
+        try:
+            # Conectar a la base de datos
+            conn = get_db_connection()
+            cur = conn.cursor()
+
+
+            # Insertar el logro en la base de datos
+            cur.execute('''
+                INSERT INTO LOGROS (Nombre, Descripcion, Requisito)
+                VALUES (%s, %s, %s)
+            ''', (nombre, descripcion, requisito))
+
+
+            # Confirmar cambios
+            conn.commit()
+            return redirect(url_for('get_logros'))
+
+
+        except psycopg2.Error as e:
+            conn.rollback()
+
+
+        finally:
+            cur.close()
+            conn.close()
+
+
+    # Renderizar el formulario inicial
+    return render_template('add_logro.html')
+
+
+
+
+
+
+
+
 @app.route('/comentarios',methods=["GET"])
 def get_comentarios():
     conn = get_db_connection()

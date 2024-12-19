@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Añadir Logro</title>
+</head>
+<body>
+    <h1>Añadir Logro</h1>
+
+
+    <!-- Mostrar mensajes de error o éxito -->
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        <ul>
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+
+    <!-- Formulario -->
+    <form method="POST">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required><br>
+
+
+        <label for="descripcion">Descripción:</label>
+        <textarea id="descripcion" name="descripcion"></textarea><br>
+
+
+        <label for="requisito">Requisito:</label>
+        <input type="text" id="requisito" name="requisito"><br>
+
+
+        <button type="submit">Añadir</button>
+    </form>
+</body>
+</html>
+
+
+
+
