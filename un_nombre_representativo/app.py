@@ -717,6 +717,57 @@ def add_logro():
 
 
 
+@app.route('/deletelogros', methods=['GET', 'POST'])
+def delete_logro():
+    if request.method == 'POST':
+        # Obtener el ID del logro desde el formulario
+        id_logro = request.form.get('id_logro')
+
+
+        try:
+            # Validar que el ID sea un número entero válido
+            id_logro = int(id_logro)
+
+
+            # Conectar a la base de datos
+            conn = get_db_connection()
+            cur = conn.cursor()
+
+
+            try:
+                # Eliminar el logro de la base de datos
+                cur.execute('''
+                    DELETE FROM LOGROS
+                    WHERE Id_logro = %s
+                ''', (id_logro,))
+
+
+                # Confirmar cambios
+                conn.commit()
+                return redirect(url_for('get_logros'))
+
+
+            except psycopg2.Error as e:
+                conn.rollback()
+
+
+            finally:
+                cur.close()
+                conn.close()
+
+
+        except ValueError:
+            return render_template('index.html', error_message=f"Error al borrar el logros: {str(e)}")
+        except Exception as e:
+            return render_template('index.html', error_message=f"Error al borrar el logros: {str(e)}")
+
+
+    # Renderizar el formulario inicial
+    return render_template('delete_logro.html')
+
+
+
+
 
 
 
