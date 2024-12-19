@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Desarrollador</title>
+</head>
+<body>
+    <h1>Editar Desarrollador</h1>
+
+
+    <!-- Mostrar mensajes flash -->
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        <ul>
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+
+    {% if not desarrollador %}
+        <!-- Si no se encuentra un desarrollador, se muestra una lista para elegir -->
+        <form method="POST">
+            <label for="id">ID del Desarrollador:</label>
+            <input type="number" id="id" name="id" required>
+            <button type="submit">Buscar Desarrollador</button>
+        </form>
+    {% else %}
+        <!-- Formulario prellenado con los datos actuales -->
+        <form action="" method="POST">
+            <!-- Campo oculto para el ID del desarrollador -->
+            <input type="hidden" name="id" value="{{ desarrollador[0] }}">
+
+
+            <label for="contraseña">Contraseña:</label><br>
+            <input type="password" name="contraseña" id="contraseña" value="{{ desarrollador[1] if desarrollador else '' }}" required minlength="8"><br><br>
+
+
+            <label for="nombre">Nombre:</label><br>
+            <input type="text" name="nombre" id="nombre" value="{{ desarrollador[2] if desarrollador else '' }}" required><br><br>
+
+
+            <label for="imagen_perfil">Imagen Perfil:</label><br>
+            <input type="text" name="imagen_perfil" id="imagen_perfil" value="{{ desarrollador[3] if desarrollador else '' }}"><br><br>
+
+
+            <label for="correo">Correo:</label><br>
+            <input type="email" name="correo" id="correo" value="{{ desarrollador[4] if desarrollador else '' }}" required><br><br>
+
+
+            <label for="pais">País:</label><br>
+            <input type="text" name="pais" id="pais" value="{{ desarrollador[5] if desarrollador else '' }}" required><br><br>
+
+
+            <label for="descripcion">Descripción:</label><br>
+            <textarea name="descripcion" id="descripcion">{{ desarrollador[6] if desarrollador else '' }}</textarea><br><br>
+
+
+            <label for="numero_empleados">Número de Empleados:</label><br>
+            <input type="number" name="numero_empleados" id="numero_empleados" value="{{ desarrollador[7] if desarrollador else '' }}" min="0" required><br><br>
+
+
+            <label for="presentacion">Presentación:</label><br>
+            <textarea name="presentacion" id="presentacion">{{ desarrollador[8] if desarrollador else '' }}</textarea><br><br>
+
+
+            <label for="pagina_web">Página Web (URL):</label><br>
+            <input type="url" name="pagina_web" id="pagina_web" value="{{ desarrollador[9] if desarrollador else '' }}"><br><br>
+
+
+            <button type="submit">Actualizar</button>
+        </form>
+    {% endif %}
+</body>
+</html>
+
+
+
+

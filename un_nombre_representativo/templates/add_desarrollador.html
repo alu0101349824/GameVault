@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Desarrollador</title>
+</head>
+<body>
+    <h1>Registrar Nuevo Desarrollador</h1>
+    
+    <!-- Mostrar mensajes flash -->
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        <ul>
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+
+    <!-- Formulario -->
+    <form action="" method="POST">
+
+        <label for="nombre">Nombre:</label><br>
+        <input type="text" name="nombre" id="nombre" required><br><br>
+
+
+        <label for="contraseña">Contraseña:</label><br>
+        <input type="password" name="contraseña" id="contraseña" required minlength="8"><br><br>
+
+
+        <label for="imagen_perfil">Imagen Perfil (URL):</label><br>
+        <input type="text" name="imagen_perfil" id="imagen_perfil"><br><br>
+
+
+        <label for="correo">Correo:</label><br>
+        <input type="email" name="correo" id="correo" required><br><br>
+
+
+        <label for="pais">País:</label><br>
+        <input type="text" name="pais" id="pais" required><br><br>
+
+
+        <label for="descripcion">Descripción:</label><br>
+        <textarea name="descripcion" id="descripcion"></textarea><br><br>
+
+
+        <label for="numero_empleados">Número de Empleados:</label><br>
+        <input type="number" name="numero_empleados" id="numero_empleados" min="0" required><br><br>
+
+
+        <label for="presentacion">Presentación:</label><br>
+        <textarea name="presentacion" id="presentacion"></textarea><br><br>
+
+
+        <label for="pagina_web">Página Web (URL):</label><br>
+        <input type="url" name="pagina_web" id="pagina_web"><br><br>
+
+
+        <button type="submit">Registrar</button>
+    </form>
+</body>
+</html>
+
+
+
+

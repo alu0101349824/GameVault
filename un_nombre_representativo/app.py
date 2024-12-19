@@ -183,10 +183,10 @@ def update_jugador():
 
 
 
-@app.route('/deletejugadores', methods=('GET', 'POST'))
-def delete_jugadores():
+@app.route('/deletedesarrolladores', methods=('GET', 'POST'))
+def delete_desarrolladores():
     if request.method == 'POST':
-        jugador_id = request.form['id']  # Obtener el ID del formulario
+        desarrollador_id = request.form['id']  # Obtener el ID del formulario
 
 
         try:
@@ -198,20 +198,21 @@ def delete_jugadores():
 
             cur = conn.cursor()
             try:
-                # Eliminar el jugador con el ID proporcionado
-                cur.execute('DELETE FROM JUGADOR WHERE Id_jugador = %s;', (int(jugador_id),))
-                
+                # Eliminar el desarrollador con el ID proporcionado
+                cur.execute('DELETE FROM DESARROLLADOR WHERE Id_desarrollador = %s;', (int(desarrollador_id),))
+
+
                 # Confirmar los cambios en la base de datos
                 conn.commit()
-                print(f"Jugador con ID {jugador_id} eliminado exitosamente.")
+                print(f"Desarrollador con ID {desarrollador_id} eliminado exitosamente.")
 
 
             except psycopg2.Error as e:
                 # Capturar errores durante el borrado
                 if conn:
                     conn.rollback()
-                print(f"Error al eliminar el jugador: {e}")
-                return render_template('index.html', error_message="Error al eliminar el jugador.")
+                print(f"Error al eliminar el desarrollador: {e}")
+                return render_template('index.html', error_message="Error al eliminar el desarrollador.")
 
 
             finally:
@@ -231,10 +232,11 @@ def delete_jugadores():
 
 
         # Redireccionar a la página principal después de eliminar el registro
-        return redirect(url_for('get_jugadores'))
+        return redirect(url_for('get_desarrolladores'))
 
 
-    return render_template('delete_jugadores.html')
+    return render_template('delete_desarrolladores.html')
+
 
 
 
@@ -250,6 +252,140 @@ def get_desarrolladores():
     cur.close()
     conn.close()
     return render_template('get_desarrollador.html', desarrolladores=desarrolladores )   
+
+
+@app.route('/adddesarrollador', methods=['GET', 'POST'])
+def add_desarrollador():
+    if request.method == 'POST':
+        try:
+            # Obtener datos del formulario
+            contraseña = request.form['contraseña']
+            nombre = request.form['nombre']
+            imagen_perfil = request.form.get('imagen_perfil', None)
+            correo = request.form['correo']
+            pais = request.form['pais']
+            descripcion = request.form.get('descripcion', None)
+            numero_empleados = int(request.form['numero_empleados'])
+            presentacion = request.form.get('presentacion', None)
+            pagina_web = request.form.get('pagina_web', None)
+
+
+            # Conexión a la base de datos
+            conn = get_db_connection()
+            cur = conn.cursor()
+
+
+            # Insertar datos en la tabla
+            cur.execute('''
+                INSERT INTO DESARROLLADOR (Contraseña, Nombre, Imagen_perfil, Correo, Pais, Descripcion, 
+                                           Numero_empleados, Presentacion, Pagina_web)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ''', (contraseña, nombre, imagen_perfil, correo, pais, descripcion, numero_empleados, presentacion, pagina_web))
+
+
+            conn.commit()
+            cur.close()
+            conn.close()
+
+
+            return redirect(url_for('get_desarrolladores'))
+
+
+        except Exception as e:
+            return render_template('index.html', error_message="Error a la hora de añadir.")
+    
+    return render_template('add_desarrollador.html')
+
+
+
+@app.route('/updatedesarrollador/', methods=['GET', 'POST'])
+def update_desarrollador():
+    
+    if request.method == 'POST':
+        desarrollador_id = request.form.get('id')
+
+
+        try:
+            # Convertir el ID a entero para evitar problemas
+            desarrollador_id = int(desarrollador_id)
+
+
+            # Conectar a la base de datos
+            conn = get_db_connection()
+            if conn is None:
+                raise psycopg2.OperationalError("No se pudo establecer la conexión con la base de datos")
+
+
+            cur = conn.cursor()
+
+
+            if 'nombre' in request.form:
+                # Obtener los datos del formulario para actualizar
+                contraseña = request.form['contraseña']
+                nombre = request.form['nombre']
+                imagen_perfil = request.form.get('imagen_perfil', None)
+                correo = request.form['correo']
+                pais = request.form['pais']
+                descripcion = request.form.get('descripcion', None)
+                numero_empleados = request.form.get('numero_empleados', None)
+                presentacion = request.form.get('presentacion', None)
+                pagina_web = request.form.get('pagina_web', None)
+
+
+                try:
+                    # Actualizar el registro en la base de datos
+                    cur.execute('''
+                        UPDATE DESARROLLADOR
+                        SET Contraseña = %s,
+                            Nombre = %s,
+                            Imagen_perfil = %s,
+                            Correo = %s,
+                            Pais = %s,
+                            Descripcion = %s,
+                            Numero_empleados = %s,
+                            Presentacion = %s,
+                            Pagina_web = %s
+                        WHERE Id_desarrollador = %s;
+                    ''', (contraseña, nombre, imagen_perfil, correo, pais, descripcion, numero_empleados, presentacion, pagina_web, desarrollador_id))
+                    
+                    # Confirmar cambios
+                    conn.commit()
+                    cur.close()
+                    conn.close()
+                    print(f"Desarrollador con ID {desarrollador_id} actualizado exitosamente.")
+
+
+                    return redirect(url_for('get_desarrolladores'))
+
+
+                except psycopg2.Error as e:
+                    conn.rollback()
+                    return render_template('index.html', error_message=f"Error al actualizar el desarrollador: {e}")
+
+
+            else:
+                # Obtener los detalles del desarrollador para pre-rellenar el formulario
+                cur.execute('SELECT * FROM DESARROLLADOR WHERE Id_desarrollador = %s;', (desarrollador_id,))
+                desarrollador = cur.fetchone()
+
+
+                if not desarrollador:
+                    return render_template('index.html', error_message=f"No se encontró el desarrollador con ID {desarrollador_id}")
+
+
+                cur.close()
+                conn.close()
+                return render_template('editar_desarrollador.html', desarrollador=desarrollador)
+
+
+        except ValueError:
+            return render_template('index.html', error_message="ID inválido. Introduce un número válido.")
+
+
+    # Renderizar el formulario inicial para pedir el ID
+    return render_template('editar_desarrollador.html', desarrollador=None)
+
+
 
 
 
