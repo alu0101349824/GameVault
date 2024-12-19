@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Videojuego</title>
+</head>
+<body>
+    <h1>Editar Videojuego</h1>
+
+
+    <!-- Mostrar mensajes de error -->
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        <ul>
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+
+    {% if not videojuego %}
+        <!-- Formulario para buscar un videojuego por ID -->
+        <form method="POST">
+            <label for="id_videojuego">ID del Videojuego:</label>
+            <input type="number" id="id_videojuego" name="id_videojuego" required>
+            <button type="submit">Buscar Videojuego</button>
+        </form>
+    {% else %}
+        <!-- Formulario para editar el videojuego -->
+        <form method="POST">
+            <input type="hidden" name="id_videojuego" value="{{ videojuego[0] }}">
+
+
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" value="{{ videojuego[1] }}" required><br>
+
+
+            <label for="fecha">Fecha (DD/MM/AAAA):</label>
+            <input type="text" id="fecha" name="fecha" value="{{ videojuego[2] }}" required><br>
+
+
+            <label for="descripcion">Descripción:</label>
+            <textarea id="descripcion" name="descripcion">{{ videojuego[3] }}</textarea><br>
+
+
+            <label for="precio">Precio:</label>
+            <input type="number" id="precio" name="precio" step="0.01" min="0" value="{{ videojuego[4] }}" required><br>
+
+
+            <label for="duracion_oferta">Duración de la Oferta (DD/MM/AAAA - DD/MM/AAAA):</label>
+            <input type="text" id="duracion_oferta" name="duracion_oferta" value="{{ videojuego[5] }}"><br>
+
+
+            <label for="descuento_oferta">Descuento de la Oferta (%):</label>
+            <input type="number" id="descuento_oferta" name="descuento_oferta" min="0" max="100" value="{{ videojuego[6] }}"><br>
+
+
+            <label for="tamaño">Tamaño (GB):</label>
+            <input type="number" id="tamaño" name="tamaño" step="0.01" min="0" value="{{ videojuego[7] }}" required><br>
+
+
+            <label for="id_desarrollador">ID del Desarrollador:</label>
+            <input type="number" id="id_desarrollador" name="id_desarrollador" value="{{ relacion[0] }}" required><br>
+
+
+            <label for="id_distribuidor">ID del Distribuidor:</label>
+            <input type="number" id="id_distribuidor" name="id_distribuidor" value="{{ relacion[1] }}" required><br>
+
+
+            <button type="submit">Actualizar Videojuego</button>
+        </form>
+    {% endif %}
+</body>
+</html>
+
+
+
+

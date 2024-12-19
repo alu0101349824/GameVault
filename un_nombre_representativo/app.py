@@ -438,6 +438,224 @@ def get_videojuegos():
     conn.close()
     return render_template('get_videojuegos.html', videojuegos=videojuegos ) 
 
+
+
+@app.route('/addvideojuegos', methods=['GET', 'POST'])
+def add_videojuego():
+    if request.method == 'POST':
+        # Obtener los datos del formulario
+        nombre = request.form['nombre']
+        fecha = request.form['fecha']
+        descripcion = request.form.get('descripcion', None)
+        precio = request.form['precio']
+        duracion_oferta = request.form.get('duracion_oferta', None)
+        descuento_oferta = request.form.get('descuento_oferta', None)
+        tamaño = request.form['tamaño']
+        id_desarrollador = request.form['id_desarrollador']
+        id_distribuidor = request.form['id_distribuidor']
+
+
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+
+
+            # Insertar el videojuego en la tabla VIDEOJUEGOS
+            cur.execute('''
+                INSERT INTO VIDEOJUEGOS (Nombre, Fecha, Descripcion, Precio, Duracion_oferta, Descuento_oferta, Tamaño)
+                VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING Id_videojuego
+            ''', (nombre, fecha, descripcion, precio, duracion_oferta, descuento_oferta, tamaño))
+            
+            id_videojuego = cur.fetchone()[0]  # Obtener el ID del videojuego recién insertado
+
+
+            # Insertar la relación en la tabla VIDEOJUEGO_DESARROLLADOR_DISTRIBUIDOR
+            cur.execute('''
+                INSERT INTO VIDEOJUEGO_DESARROLLADOR_DISTRIBUIDOR (Id_desarrollador, Id_distribuidor, Id_videojuego)
+                VALUES (%s, %s, %s)
+            ''', (id_desarrollador, id_distribuidor, id_videojuego))
+            
+            # Confirmar cambios
+            conn.commit()
+            cur.close()
+            conn.close()
+
+
+        
+            return redirect(url_for('get_videojuegos'))
+
+
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            return render_template('index.html', error_message=f"Error al añadir el videojuego: {str(e)}")
+        finally:
+            if 'cur' in locals():
+                cur.close()
+            if 'conn' in locals() and conn:
+                conn.close()
+
+
+    return render_template('add_videojuego.html')
+
+
+
+@app.route('/updatevideojuegos', methods=['GET', 'POST'])
+def update_videojuego():
+    if request.method == 'POST':
+        # Obtener el ID del videojuego desde el formulario
+        id_videojuego = request.form.get('id_videojuego')
+
+
+        try:
+            # Convertir el ID a entero para evitar problemas
+            id_videojuego = int(id_videojuego)
+
+
+            # Conectar a la base de datos
+            conn = get_db_connection()
+            cur = conn.cursor()
+
+
+            if 'nombre' in request.form:
+                # Obtener los datos del formulario para actualizar
+                nombre = request.form['nombre']
+                fecha = request.form['fecha']
+                descripcion = request.form.get('descripcion', None)
+                precio = request.form['precio']
+                duracion_oferta = request.form.get('duracion_oferta', None)
+                descuento_oferta = request.form.get('descuento_oferta', None)
+                tamaño = request.form['tamaño']
+                id_desarrollador = request.form['id_desarrollador']
+                id_distribuidor = request.form['id_distribuidor']
+
+
+                try:
+                    # Actualizar los datos del videojuego
+                    cur.execute('''
+                        UPDATE VIDEOJUEGOS
+                        SET Nombre = %s,
+                            Fecha = %s,
+                            Descripcion = %s,
+                            Precio = %s,
+                            Duracion_oferta = %s,
+                            Descuento_oferta = %s,
+                            Tamaño = %s
+                        WHERE Id_videojuego = %s
+                    ''', (nombre, fecha, descripcion, precio, duracion_oferta, descuento_oferta, tamaño, id_videojuego))
+
+
+                    # Actualizar la relación en VIDEOJUEGO_DESARROLLADOR_DISTRIBUIDOR
+                    cur.execute('''
+                        UPDATE VIDEOJUEGO_DESARROLLADOR_DISTRIBUIDOR
+                        SET Id_desarrollador = %s,
+                            Id_distribuidor = %s
+                        WHERE Id_videojuego = %s
+                    ''', (id_desarrollador, id_distribuidor, id_videojuego))
+
+
+                    conn.commit()
+                    return redirect(url_for('get_videojuegos'))
+
+
+                except psycopg2.Error as e:
+                    conn.rollback()
+
+
+            # Cargar los datos actuales del videojuego si no hay `POST`
+            cur.execute('SELECT * FROM VIDEOJUEGOS WHERE Id_videojuego = %s', (id_videojuego,))
+            videojuego = cur.fetchone()
+
+
+            cur.execute('''
+                SELECT Id_desarrollador, Id_distribuidor
+                FROM VIDEOJUEGO_DESARROLLADOR_DISTRIBUIDOR
+                WHERE Id_videojuego = %s
+            ''', (id_videojuego,))
+            relacion = cur.fetchone()
+
+
+            cur.close()
+            conn.close()
+
+
+            return render_template('editar_videojuego.html', videojuego=videojuego, relacion=relacion)
+
+
+        except ValueError:
+            return render_template('editar_videojuego.html', videojuego=None, relacion=None)
+
+
+        except Exception as e:
+            return render_template('index.html', error_message=f"Error al añadir el videojuego: {str(e)}")
+
+
+    # Renderizar formulario inicial para buscar el videojuego
+    return render_template('editar_videojuego.html', videojuego=None, relacion=None)
+
+
+
+@app.route('/deletevideojuegos', methods=['GET', 'POST'])
+def delete_videojuego():
+    if request.method == 'POST':
+        # Obtener el ID del videojuego desde el formulario
+        id_videojuego = request.form.get('id_videojuego')
+
+
+        try:
+            # Convertir el ID a entero para evitar problemas
+            id_videojuego = int(id_videojuego)
+
+
+            # Conectar a la base de datos
+            conn = get_db_connection()
+            cur = conn.cursor()
+
+
+            try:
+                # Eliminar la relación en VIDEOJUEGO_DESARROLLADOR_DISTRIBUIDOR
+                cur.execute('''
+                    DELETE FROM VIDEOJUEGO_DESARROLLADOR_DISTRIBUIDOR
+                    WHERE Id_videojuego = %s
+                ''', (id_videojuego,))
+
+
+                # Eliminar el videojuego en VIDEOJUEGOS
+                cur.execute('''
+                    DELETE FROM VIDEOJUEGOS
+                    WHERE Id_videojuego = %s
+                ''', (id_videojuego,))
+
+
+                # Confirmar cambios
+                conn.commit()
+                return redirect(url_for('get_videojuegos'))
+
+
+            except psycopg2.Error as e:
+                conn.rollback()
+                return render_template('index.html', error_message=f"Error al añadir el videojuego: {str(e)}")
+
+
+            finally:
+                cur.close()
+                conn.close()
+
+
+        except ValueError:
+            return render_template('index.html', error_message=f"Error al añadir el videojuego: {str(e)}")
+        except Exception as e:
+            return render_template('index.html', error_message=f"Error al añadir el videojuego: {str(e)}")
+
+
+    # Renderizar el formulario inicial para eliminar el videojuego
+    return render_template('delete_videojuego.html')
+
+
+
+
+
+
 @app.route('/generos', methods=["GET"])
 def get_generos():
     conn = get_db_connection()
@@ -488,6 +706,60 @@ def get_bibliotecas():
     conn.close()
     return render_template('get_bilbiotecas.html', bibliotecas=bibliotecas)
 
+@app.route('/addtobiblioteca', methods=['GET', 'POST'])
+def add_to_biblioteca():
+    if request.method == 'POST':
+        # Obtener los datos del formulario
+        id_biblioteca = request.form['id_biblioteca']
+        id_videojuego = request.form['id_videojuego']
+        activo = request.form['activo'] == 'true'  # Convertir el valor a booleano
+        tiempo = request.form.get('tiempo', None)
+        fecha = request.form['fecha']
+        fecha_guardado = request.form['fecha_guardado']
+
+
+        try:
+            # Conectar a la base de datos
+            conn = get_db_connection()
+            cur = conn.cursor()
+
+
+            # Insertar el videojuego en la biblioteca
+            cur.execute('''
+                INSERT INTO BIBLIOTECA_VIDEOJUEGO (Id_videojuego, Id_biblioteca, Activo, Tiempo, Fecha, Fecha_guardado)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            ''', (id_videojuego, id_biblioteca, activo, tiempo, fecha, fecha_guardado))
+
+
+            # Actualizar el número de juegos en la biblioteca
+            cur.execute('''
+                UPDATE BIBLIOTECA
+                SET Numero_juegos = Numero_juegos + 1
+                WHERE Id_biblioteca = %s
+            ''', (id_biblioteca,))
+
+
+            # Confirmar cambios
+            conn.commit()
+            return redirect(url_for('get_bibliotecas'))
+
+
+        except psycopg2.Error as e:
+            conn.rollback()
+            return render_template('index.html', error_message=f"Error al añadir el videojuego: {str(e)}")
+
+
+        finally:
+            cur.close()
+            conn.close()
+
+
+    # Renderizar el formulario inicial
+    return render_template('add_to_biblioteca.html')
+
+
+
+
 @app.route('/distribuidores', methods=["GET"])
 def get_distribuidores():
     conn = get_db_connection()
@@ -510,7 +782,7 @@ def add_distribuidor():
 
 
         if not nombre or not numero_empleado.isdigit() or int(numero_empleado) < 0:
-            return render_template('add_distribuidor.html', error_message="Datos inválidos. Verifica los campos.")
+            return render_template('index.html', error_message="Datos inválidos. Verifica los campos.")
 
 
         try:
@@ -524,7 +796,7 @@ def add_distribuidor():
         except Exception as e:
             if conn:
                 conn.rollback()
-            return render_template('add_distribuidor.html', error_message=f"Error al añadir distribuidor: {str(e)}")
+            return render_template('index.html', error_message=f"Error al añadir distribuidor: {str(e)}")
         finally:
             if cur:
                 cur.close()
@@ -614,6 +886,7 @@ def update_distribuidor():
 
     # Renderizar el formulario inicial para pedir el ID
     return render_template('update_distribuidor.html', distribuidor=None)
+
 
 
 @app.route('/deletedistribuidores', methods=('GET', 'POST'))

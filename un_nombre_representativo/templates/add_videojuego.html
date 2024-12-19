@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Añadir Videojuego</title>
+</head>
+<body>
+    <h1>Añadir Nuevo Videojuego</h1>
+
+
+    <!-- Mostrar mensajes de error -->
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+
+
+    <form method="POST">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required><br>
+
+
+        <label for="fecha">Fecha (DD/MM/AAAA):</label>
+        <input type="text" id="fecha" name="fecha" required><br>
+
+
+        <label for="descripcion">Descripción:</label>
+        <textarea id="descripcion" name="descripcion"></textarea><br>
+
+
+        <label for="precio">Precio:</label>
+        <input type="number" id="precio" name="precio" step="0.01" min="0" required><br>
+
+
+        <label for="duracion_oferta">Duración de la Oferta (DD/MM/AAAA - DD/MM/AAAA):</label>
+        <input type="text" id="duracion_oferta" name="duracion_oferta"><br>
+
+
+        <label for="descuento_oferta">Descuento de la Oferta (%):</label>
+        <input type="number" id="descuento_oferta" name="descuento_oferta" min="0" max="100"><br>
+
+
+        <label for="tamaño">Tamaño (GB):</label>
+        <input type="number" id="tamaño" name="tamaño" step="0.01" min="0" required><br>
+
+
+        <label for="id_desarrollador">ID del Desarrollador:</label>
+        <input type="number" id="id_desarrollador" name="id_desarrollador" required><br>
+
+
+        <label for="id_distribuidor">ID del Distribuidor:</label>
+        <input type="number" id="id_distribuidor" name="id_distribuidor" required><br>
+
+
+        <button type="submit">Añadir Videojuego</button>
+    </form>
+</body>
+</html>
+
+
+
+
