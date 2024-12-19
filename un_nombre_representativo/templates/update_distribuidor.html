@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Distribuidor</title>
+</head>
+<body>
+    <h1>Editar Distribuidor</h1>
+
+
+    <!-- Mostrar mensajes de error -->
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+
+
+    <!-- Formulario para ingresar el ID -->
+    {% if not distribuidor %}
+        <form method="POST">
+            <label for="id">ID del Distribuidor:</label>
+            <input type="number" id="id" name="id" required>
+            <button type="submit">Buscar Distribuidor</button>
+        </form>
+    {% else %}
+        <!-- Formulario para actualizar los datos del distribuidor -->
+        <form method="POST">
+            <input type="hidden" name="id" value="{{ distribuidor[0] }}">
+
+
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" value="{{ distribuidor[1] }}" required><br>
+
+
+            <label for="numero_empleados">Número de Empleados:</label>
+            <input type="number" id="numero_empleados" name="numero_empleados" value="{{ distribuidor[2] }}" min="0"><br>
+
+
+            <label for="pagina_web">Página Web:</label>
+            <input type="text" id="pagina_web" name="pagina_web" value="{{ distribuidor[3] }}"><br>
+
+
+            <label for="presentacion">Presentación:</label>
+            <textarea id="presentacion" name="presentacion">{{ distribuidor[4] }}</textarea><br>
+
+
+            <button type="submit">Actualizar Distribuidor</button>
+        </form>
+    {% endif %}
+</body>
+</html>
+
+
+
+

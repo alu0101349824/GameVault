@@ -181,6 +181,44 @@ def update_jugador():
     # Renderizar el formulario inicial para pedir el ID
     return render_template('update_jugadores.html', jugador=None)
 
+@app.route('/deletejugadores', methods=('GET', 'POST'))
+def delete_jugadores():
+    if request.method == 'POST':
+        jugador_id = request.form['id']  # Obtener el ID del formulario
+        try:
+            # Conectar a la base de datos
+            conn = get_db_connection()
+            if conn is None:
+                raise psycopg2.OperationalError("No se pudo establecer la conexión con la base de datos")
+            cur = conn.cursor()
+            try:
+                # Eliminar el jugador con el ID proporcionado
+                cur.execute('DELETE FROM JUGADOR WHERE Id_jugador = %s;', (int(jugador_id),))
+                
+                # Confirmar los cambios en la base de datos
+                conn.commit()
+                print(f"Jugador con ID {jugador_id} eliminado exitosamente.")
+            except psycopg2.Error as e:
+                # Capturar errores durante el borrado
+                if conn:
+                    conn.rollback()
+                print(f"Error al eliminar el jugador: {e}")
+                return render_template('index.html', error_message="Error al eliminar el jugador.")
+            finally:
+                # Cerrar cursor
+                cur.close()
+        except psycopg2.OperationalError as e:
+            print(f"Error al conectarse a la base de datos: {e}")
+            return render_template('index.html', error_message="No se pudo conectar a la base de datos.")
+        finally:
+            # Cerrar conexión
+            if 'conn' in locals() and conn is not None:
+                conn.close()
+        # Redireccionar a la página principal después de eliminar el registro
+        return redirect(url_for('get_jugadores'))
+    return render_template('delete_jugadores.html')
+
+
 
 
 @app.route('/deletedesarrolladores', methods=('GET', 'POST'))
@@ -460,6 +498,194 @@ def get_distribuidores():
     conn.close()
     return render_template('get_distribuidores.html', distribuidores=distribuidores)
 
-    
+
+
+@app.route('/adddistribuidores', methods=['GET', 'POST'])
+def add_distribuidor():
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        numero_empleado = request.form['numero_empleado']
+        pagina_web = request.form.get('pagina_web', None) or None
+        presentacion = request.form.get('presentacion', None) or None
+
+
+        if not nombre or not numero_empleado.isdigit() or int(numero_empleado) < 0:
+            return render_template('add_distribuidor.html', error_message="Datos inválidos. Verifica los campos.")
+
+
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute('''
+                INSERT INTO DISTRIBUIDOR (Nombre, Numero_Empleado, Pagina_web, Presentacion)
+                VALUES (%s, %s, %s, %s)
+            ''', (nombre, numero_empleado, pagina_web, presentacion))
+            conn.commit()
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            return render_template('add_distribuidor.html', error_message=f"Error al añadir distribuidor: {str(e)}")
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+
+
+        return redirect(url_for('get_distribuidores'))
+
+
+    return render_template('add_distribuidor.html')
+
+
+@app.route('/updatedistribuidor/', methods=['GET', 'POST'])
+def update_distribuidor():
+    if request.method == 'POST':
+        distribuidor_id = request.form.get('id')
+
+
+        try:
+            # Convertir el ID a entero para evitar problemas
+            distribuidor_id = int(distribuidor_id)
+
+
+            # Conectar a la base de datos
+            conn = get_db_connection()
+            if conn is None:
+                raise psycopg2.OperationalError("No se pudo establecer la conexión con la base de datos")
+
+
+            cur = conn.cursor()
+
+
+            if 'nombre' in request.form:
+                # Obtener los datos del formulario para actualizar
+                nombre = request.form['nombre']
+                numero_empleados = request.form.get('numero_empleados', None)
+                pagina_web = request.form.get('pagina_web', None)
+                presentacion = request.form.get('presentacion', None)
+
+
+                try:
+                    # Actualizar el registro en la base de datos
+                    cur.execute('''
+                        UPDATE DISTRIBUIDOR
+                        SET Nombre = %s,
+                            Numero_Empleado = %s,
+                            Pagina_web = %s,
+                            Presentacion = %s
+                        WHERE Id_distribuidor = %s;
+                    ''', (nombre, numero_empleados, pagina_web, presentacion, distribuidor_id))
+
+
+                    # Confirmar cambios
+                    conn.commit()
+                    cur.close()
+                    conn.close()
+                    print(f"Distribuidor con ID {distribuidor_id} actualizado exitosamente.")
+
+
+                    return redirect(url_for('get_distribuidores'))
+
+
+                except psycopg2.Error as e:
+                    conn.rollback()
+                    return render_template('index.html', error_message=f"Error al actualizar el distribuidor: {e}")
+
+
+            else:
+                # Obtener los detalles del distribuidor para pre-rellenar el formulario
+                cur.execute('SELECT * FROM DISTRIBUIDOR WHERE Id_distribuidor = %s;', (distribuidor_id,))
+                distribuidor = cur.fetchone()
+
+
+                if not distribuidor:
+                    return render_template('index.html', error_message=f"No se encontró el distribuidor con ID {distribuidor_id}")
+
+
+                cur.close()
+                conn.close()
+                return render_template('update_distribuidor.html', distribuidor=distribuidor)
+
+
+        except ValueError:
+            return render_template('index.html', error_message="ID inválido. Introduce un número válido.")
+
+
+    # Renderizar el formulario inicial para pedir el ID
+    return render_template('update_distribuidor.html', distribuidor=None)
+
+
+@app.route('/deletedistribuidores', methods=('GET', 'POST'))
+def delete_distribuidores():
+    if request.method == 'POST':
+        distribuidor_id = request.form['id']  # Obtener el ID del formulario
+
+
+        try:
+            # Conectar a la base de datos
+            conn = get_db_connection()
+            if conn is None:
+                raise psycopg2.OperationalError("No se pudo establecer la conexión con la base de datos")
+
+
+            cur = conn.cursor()
+            try:
+                # Eliminar el distribuidor con el ID proporcionado
+                cur.execute('DELETE FROM DISTRIBUIDOR WHERE Id_distribuidor = %s;', (int(distribuidor_id),))
+
+
+                # Confirmar los cambios en la base de datos
+                conn.commit()
+                print(f"Distribuidor con ID {distribuidor_id} eliminado exitosamente.")
+
+
+            except psycopg2.Error as e:
+                # Capturar errores durante el borrado
+                if conn:
+                    conn.rollback()
+                print(f"Error al eliminar el distribuidor: {e}")
+                return render_template('index.html', error_message="Error al eliminar el distribuidor.")
+
+
+            finally:
+                # Cerrar cursor
+                cur.close()
+
+
+        except psycopg2.OperationalError as e:
+            print(f"Error al conectarse a la base de datos: {e}")
+            return render_template('index.html', error_message="No se pudo conectar a la base de datos.")
+
+
+        finally:
+            # Cerrar conexión
+            if 'conn' in locals() and conn is not None:
+                conn.close()
+
+
+        # Redireccionar a la página principal después de eliminar el registro
+        return redirect(url_for('get_distribuidores'))
+
+
+    return render_template('delete_distribuidores.html')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
